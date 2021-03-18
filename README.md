@@ -10,6 +10,7 @@ Since Windows 8, Microsoft has been slowly building a modern virtual input metho
 Decide ReplaceOSK isn't for you? Run it again and it'll undo all changes to your system.
 
 ## Known Issues
-TabTip may be an infinitely superior input method to the legacy OSK, but it's not without its quirks. Since the Anniversary Update to Windows 10, running TabTip only loads the application into memory. To open the keyboard requires a separate invokation from whatever application is requesting input. This is problematic, since the whole purpose of the legacy OSK was to be opened on-demand. To solve this, ReplaceOSK uses a Registry key to inform TabTip to auto-invoke itself when launched. **This workaround will only function if no physical keyboard is present.** Unfortunately, ReplaceOSK is not suitable for use as a supplement to a physical keyboard.
-
-Also, because Windows doesn't allow restarting `TabletInputService` live, you'll have to log out of your Windows session and back in for Registry changes to apply.
+* **TabTip fails to invoke when physical keyboards are present**
+    * TabTip may be an infinitely superior input method to the legacy OSK, but it's not without its quirks. Since the Anniversary Update to Windows 10, running TabTip only loads the application into memory. To open the keyboard requires a separate invokation from whatever application is requesting input. This is problematic, since the whole purpose of the legacy OSK was to be opened on-demand. To solve this, ReplaceOSK uses a Registry key to inform TabTip to auto-invoke itself when launched. **This workaround will only function if no physical keyboard is present.** Unfortunately, ReplaceOSK is not suitable for use as a supplement to a physical keyboard.
+* **Restart is required**
+    * Because Windows doesn't allow restarting `TabletInputService` live, you'll have to log out of your Windows session and back in for Registry changes to apply.
