@@ -1,5 +1,5 @@
-# ReplaceOSK
-Replace the legacy Windows 10 on-screen keyboard with a more modern virtual input method
+# ⌨ ReplaceOSK
+Replace the legacy Windows 10 on-screen keyboard with a more modern virtual input method!
 
 ## About
 Since Windows 8, Microsoft has been slowly building a modern virtual input method for touch-based Windows devices inspired by the designs of smartphone keyboards. Unfortunately, as with many parts of Windows, legacy components continue to linger in the recesses of the operating system. One such component is the legacy OSK, an XP-era on-screen keyboard meant for mice, not fingers. This can be an annoyance when working with some touch-based devices that default to the legacy OSK, so why not get rid of it?
