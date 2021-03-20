@@ -2,15 +2,28 @@
 Replace the legacy Windows 10 on-screen keyboard with a more modern virtual input method!
 
 ## About
-Since Windows 8, Microsoft has been slowly building a modern virtual input method for touch-based Windows devices inspired by the designs of smartphone keyboards. Unfortunately, as with many parts of Windows, legacy components continue to linger in the recesses of the operating system. One such component is the legacy OSK, an XP-era on-screen keyboard meant for mice, not fingers. This can be an annoyance when working with some touch-based devices that default to the legacy OSK, so why not get rid of it?
+Since Windows 8, Microsoft has been building a modern virtual input method for touch-based devices inspired by smartphone conventions. Unfortunately, as with many parts of Windows, legacy components continue to linger in the recesses of the operating system. One such component is the legacy OSK, an XP-era on-screen keyboard meant for mice, not fingers. This can be an annoyance when working with some touch-based devices that default to the legacy OSK, so why not get rid of it?
 
 ## How to Use
-[ReplaceOSK](https://github.com/Lulech23/ReplaceOSK/blob/main/ReplaceOSK.bat) is a simple Batch file which will replace the legacy OSK with TabTip, Microsoft's modern keyboard, at the system level. Simply download and run it and it'll take care of the rest.
+ReplaceOSK is comprised of two components: **ReplaceOSK**, and **TabTipProxy**. Using TabTipProxy is optional, but strongly recommended. TabTipProxy will be used by default if a suitable [.NET Runtime](https://dotnet.microsoft.com/download) is available on the host PC (most installations of Windows 10 should include this by default). At this time, >=4.8 is recommended.
 
-Decide ReplaceOSK isn't for you? Run it again and it'll undo all changes to your system.
+#### To Install:
+1. Download the latest version of ReplaceOSK from [releases](https://github.com/Lulech23/ReplaceOSK/releases). 
+2. Run `ReplaceOSK.bat`.
+
+#### To Uninstall:
+1. Run `ReplaceOSK.bat` again and it'll undo all changes to your system.
+
+Note that changes made by ReplaceOSK are permanent until uninstalled, so you do not need to keep downloaded files on your PC after installation.
+
+### About TabTipProxy
+Windows touch input is handled by a UWP application called `TextInputHost.exe`. A classic win32 application called `TabTip.exe` is used to invoke the on-screen keyboard. However, replacing the legacy OSK with `TabTip.exe` has some caveats: a registry modification is required (and therefore reboot), and it can only be used to open, not close, the keyboard.
+
+To solve these issues, TabTipProxy was created to act as a middleman between ReplaceOSK and `TabTip.exe`. If a suitable .NET Framework is available when running `ReplaceOSK.bat`, TabTipProxy will be generated and compiled as JScript on the user's own machine. This avoids potential issues with Windows treating any invisible application as a virus threat and keeps ReplaceOSK as a project transparent and lightweight.
+
+While TabTipProxy provides a much better experience than vanilla TabTip, if a JScript.NET compiler can't be found on the host PC, ReplaceOSK will fallback to vanilla TabTip instead. The type of installation used will be indicated both during the initial ReplaceOSK operation and in subsequent runs of the Batch script.
 
 ## Known Issues
-* **TabTip fails to invoke when physical keyboards are present**
-    * TabTip may be an infinitely superior input method to the legacy OSK, but it's not without its quirks. Since the Anniversary Update to Windows 10, running TabTip only loads the application into memory. To open the keyboard requires a separate invokation from whatever application is requesting input. This is problematic, since the whole purpose of the legacy OSK was to be opened on-demand. To solve this, ReplaceOSK uses a Registry key to inform TabTip to auto-invoke itself when launched. **This workaround will only function if no physical keyboard is present.** Unfortunately, ReplaceOSK is not suitable for use as a supplement to a physical keyboard.
-* **Restart is required**
-    * Because Windows doesn't allow restarting `TabletInputService` live, you'll have to log out of your Windows session and back in for Registry changes to apply.
+* **TabTipProxy fails to invoke when keyboard was previously closed with X button instead of TabTipProxy**
+    * Windows does not normally remove TabTip or TextInputHost from memory when closed. There is no known way to detect when the keyboard has been closed via X at this time, so TabTipProxy will assume the keyboard is still open and close it instead (even if it is technically already closed).
+    * Workaround: if running TabTipProxy seems to have no effect the first time, run it again.
