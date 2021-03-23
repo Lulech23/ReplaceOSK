@@ -24,7 +24,7 @@ pushd "%CD%"
 cd /d "%~dp0"
 
 echo [96m//////////////////////////////////////////// [0m
-echo [96m//     REPLACE OSK by LULECH23 [v2.0]     // [0m
+echo [96m//     REPLACE OSK by LULECH23 [v2.1]     // [0m
 echo [96m//////////////////////////////////////////// [0m
 echo.
 echo This script will replace the legacy Windows OSK with the modern touch keyboard^.
@@ -56,16 +56,16 @@ REM /////////////////////////
 REM Get .NET Framework version based on OS
 reg Query "HKLM\Hardware\Description\System\CentralProcessor\0" | find /i "x86" > NUL && set FrameWork="Framework" || set FrameWork="Framework64"
 
-REM Find JScript.NET compiler
-set jsc=NULL
+REM Find VB.NET compiler
+set vbc=NULL
 if exist "%SystemRoot%\Microsoft.NET\!FrameWork!\" (
-    for /f "tokens=* delims=" %%j in ('dir /b /s /a:-d /o:-n "%SystemRoot%\Microsoft.NET\!FrameWork!\*jsc.exe"') do (
-        set "jsc=%%j"
+    for /f "tokens=* delims=" %%j in ('dir /b /s /a:-d /o:-n "%SystemRoot%\Microsoft.NET\!FrameWork!\*vbc.exe"') do (
+        set "vbc=%%j"
     )
     goto :export
 )
 
-if !jsc!==NULL (
+if !vbc!==NULL (
     goto :fallback
 )
 
@@ -75,49 +75,48 @@ if not exist "%APPDATA%\TabTipProxy\" (
     mkdir "%APPDATA%\TabTipProxy\"
 )
 
-echo import System;                                                                                 >  "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo import System.Diagnostics;                                                                     >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo.                                                                                               >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo /*                                                                                             >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo /////////////////////////////////////////////                                                  >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo //     TABTIP PROXY by LULECH23 [v1.0]     //                                                  >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo /////////////////////////////////////////////                                                  >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo.                                                                                               >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo This script will open and close the modern Windows touch                                       >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo keyboard when run. Must be compiled to EXE to be used as                                       >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo a legacy OSK replacement.                                                                      >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo */                                                                                             >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo.                                                                                               >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo // Command                                                                                     >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo var cmd = ^"/c \"" +                                                                           >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo // Check for active input process                                                              >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo "if exist \"%%APPDATA%%\\TabTipProxy.lock\" ( " +                                              >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo     // Close input, if open                                                                    >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo     "wmic process where \"name='TextInputHost.exe'\" delete & " +                              >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo     "del /f /q \"%%APPDATA%%\\TabTipProxy.lock\" " +                                           >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo ") else ( " +                                                                                  >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo     // Open input, if closed                                                                   >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo     "wmic process where \"name='TabTip.exe'\" delete & " +                                     >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo     "start \"\" \"%%PROGRAMFILES%%\\Common Files\\microsoft shared\\ink\\TabTip.exe\" & " +    >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo     "echo 1 > \"%%APPDATA%%\\TabTipProxy.lock\" " +                                            >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo ")" +                                                                                          >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo ^"\"";                                                                                         >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo.                                                                                               >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo // Settings                                                                                    >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo var s = new System.Diagnostics.ProcessStartInfo("cmd.exe", cmd);                               >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo s.CreateNoWindow = true;                                                                       >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo s.UseShellExecute = true;                                                                      >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo s.WindowStyle = ProcessWindowStyle.Hidden;                                                     >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo.                                                                                               >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo // Process                                                                                     >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo var p = new System.Diagnostics.Process;                                                        >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo p.StartInfo = s;                                                                               >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo.                                                                                               >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo // Run process                                                                                 >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
-echo p.Start();                                                                                     >> "%APPDATA%\TabTipProxy\TabTipProxy.js"
+echo Imports System                                                                                                                                         >  "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo Imports System.Diagnostics                                                                                                                             >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo Imports System.Threading                                                                                                                               >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo Imports System.Runtime.InteropServices                                                                                                                 >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo.                                                                                                                                                       >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo ' /////////////////////////////////////////////                                                                                                        >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo ' //     TABTIP PROXY by LULECH23 [v2.0]     //                                                                                                        >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo ' /////////////////////////////////////////////                                                                                                        >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo '                                                                                                                                                      >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo ' This script will open and close the modern Windows touch                                                                                             >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo ' keyboard when run. Must be compiled to EXE to be used as                                                                                             >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo ' a legacy OSK replacement.                                                                                                                            >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo.                                                                                                                                                       >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo Module mainModule                                                                                                                                      >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo     Public Class User32                                                                                                                                >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo             ^<DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)^> _                                                                   >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo             Public Shared Function SendMessage(ByVal hWnd As IntPtr, ByVal Msg As UInteger, ByVal wParam As IntPtr, ByVal lParam As IntPtr) As Boolean >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo             End Function                                                                                                                               >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo.                                                                                                                                                       >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo             ^<DllImport("user32.dll", SetLastError:=True, CharSet:=CharSet.Auto)^> _                                                                   >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo             Public Shared Function FindWindow(ByVal lpClassName As String, ByVal lpWindowName As String) As IntPtr                                     >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo             End Function                                                                                                                               >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo     End Class                                                                                                                                          >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo.                                                                                                                                                       >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo     Sub Main()                                                                                                                                         >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo         Dim WM_SYSCOMMAND As Int32 = 274                                                                                                               >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo         Dim SC_CLOSE As UInt32 = 61536                                                                                                                 >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo         Dim TouchhWnd As New IntPtr(0)                                                                                                                 >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo         TouchhWnd = User32.FindWindow("IPTip_Main_Window", Nothing)                                                                                    >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo.                                                                                                                                                       >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo         If TouchhWnd = 0 Then                                                                                                                          >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo             ' TabTip is closed, open TabTip                                                                                                            >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo             Process.Start(Environ("ProgramFiles") + "\Common Files\Microsoft Shared\ink\TabTip.exe")                                                   >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo         Else                                                                                                                                           >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo             ' TabTip is opened, close TabTip                                                                                                           >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo             User32.SendMessage(TouchhWnd, WM_SYSCOMMAND, SC_CLOSE, 0)                                                                                  >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo         End If                                                                                                                                         >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo     End Sub                                                                                                                                            >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
+echo End Module                                                                                                                                             >> "%APPDATA%\TabTipProxy\TabTipProxy.vb"
 
 REM Compile TabTipProxy
-"!jsc!" /nologo /t:winexe /out:"%APPDATA%\TabTipProxy\TabTipProxy.exe" "%APPDATA%\TabTipProxy\TabTipProxy.js"
+"!vbc!" /nologo /t:winexe /out:"%APPDATA%\TabTipProxy\TabTipProxy.exe" "%APPDATA%\TabTipProxy\TabTipProxy.vb"
 
 set proxy="%APPDATA%\TabTipProxy\TabTipProxy.exe"
 goto :replace
@@ -155,9 +154,9 @@ if not exist "%WINDIR%\System32\osk.exe.bak" (
     REM End process, we're done!
     echo.
     echo Legacy OSK replaced with modern touch keyboard^.
-    if !jsc!==NULL (
+    if !vbc!==NULL (
         echo.
-        echo Please sign out of Windows to finish applying changes to the system^.
+        echo Please restart Windows to finish applying changes to the system^.
     )
 ) else (
     REM Delete modern touch OSK proxy
@@ -173,6 +172,10 @@ if not exist "%WINDIR%\System32\osk.exe.bak" (
 
     echo.
     echo Legacy OSK restored^.
+    if !vbc!==NULL (
+        echo.
+        echo Please restart Windows to finish applying changes to the system^.
+    )
 )
 
 echo.[93m

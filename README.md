@@ -14,14 +14,18 @@ ReplaceOSK is comprised of two components: **ReplaceOSK**, and **TabTipProxy**. 
 #### To Uninstall:
 1. Run `ReplaceOSK.bat` again and it'll undo all changes to your system.
 
+#### To Update:
+1. Run `ReplaceOSK.bat` to uninstall previous versions
+2. Run `ReplaceOSK.bat` again to install the new version
+
 Note that changes made by ReplaceOSK are permanent until uninstalled, so you do not need to keep downloaded files on your PC after installation.
 
 ### About TabTipProxy
 Windows touch input is handled by a UWP application called `TextInputHost.exe`. A classic win32 application called `TabTip.exe` is used to invoke the on-screen keyboard. However, replacing the legacy OSK with `TabTip.exe` has some caveats: a registry modification is required (and therefore reboot), and it can only be used to open, not close, the keyboard.
 
-To solve these issues, TabTipProxy was created to act as a middleman between ReplaceOSK and `TabTip.exe`. If a suitable .NET Framework is available when running `ReplaceOSK.bat`, TabTipProxy will be generated and compiled as JScript on the user's own machine. This avoids potential issues with Windows treating any invisible application as a virus threat and keeps ReplaceOSK as a project transparent and lightweight.
+To solve these issues, TabTipProxy was created to act as a middleman between ReplaceOSK and `TabTip.exe`. If a suitable .NET Framework is available when running `ReplaceOSK.bat`, TabTipProxy will be generated and compiled as Visual Basic on the user's own machine. This avoids potential issues with Windows treating any invisible application as a virus threat and keeps ReplaceOSK as a project transparent and lightweight.
 
-While TabTipProxy provides a much better experience than vanilla TabTip, if a JScript.NET compiler can't be found on the host PC, ReplaceOSK will fallback to vanilla TabTip instead. The type of installation used will be indicated both during the initial ReplaceOSK operation and in subsequent runs of the Batch script.
+While TabTipProxy provides a much better experience than vanilla TabTip, if a Visual Basic .NET compiler can't be found on the host PC, ReplaceOSK will fallback to vanilla TabTip instead. The type of installation used will be indicated both during the initial ReplaceOSK operation and in subsequent runs of the Batch script.
 
 ## Known Issues
 * **TabTipProxy fails to invoke when keyboard was previously closed with X button instead of TabTipProxy**
