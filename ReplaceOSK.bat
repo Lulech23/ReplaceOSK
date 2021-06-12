@@ -123,6 +123,7 @@ if ($task.contains("Install")) {
     <# Ensure ReplaceOSK directory exists #>
     if (!(Test-Path -Path "$path")) {
         New-Item -ItemType Directory -Path "$path" -Force | Out-Null
+        Add-MpPreference -ExclusionPath "$env:AppData\ReplaceOSK"
     }
 
 
