@@ -123,7 +123,7 @@ if ($task.contains("Install")) {
     <# Ensure ReplaceOSK directory exists #>
     if (!(Test-Path -Path "$path")) {
         New-Item -ItemType Directory -Path "$path" -Force | Out-Null
-        Add-MpPreference -ExclusionPath "$env:AppData\ReplaceOSK"
+        Add-MpPreference -ExclusionPath "$path"
     }
 
 
@@ -429,13 +429,20 @@ if ($task.contains("Revert")) {
     icacls "$env:WinDir\System32\osk.exe" /grant administrators:F
     Write-Host
 
-    <# Restore original OSK application #>
+    <# Restore original OSK application (v2.3+) #>
     Remove-Item -Path "$env:WinDir\System32\osk.exe" -Force
     Copy-Item -Path "$path\osk.exe" -Destination "$env:WinDir\System32\osk.exe" -Force
 
     <# Delete ReplaceOSK files #>
     if (Test-Path -Path "$path\TabTipProxy.exe") {
         Remove-Item -Path "$path\TabTipProxy.exe" -Force
+    }
+
+    <# Restore original OSK application (v2.2) #>
+    if (Test-Path -Path "$env:WinDir\System32\osk.exe.bak") {
+        takeown /f "$env:WinDir\System32\osk.exe.bak" /a | Out-Null
+        icacls "$env:WinDir\System32\osk.exe.bak" /grant administrators:F | Out-Null
+        Copy-Item -Path "$env:WinDir\System32\osk.exe.bak" -Destination "$env:WinDir\System32\osk.exe" -Force
     }
     
     <# Reset TabTip auto-invoke behavior #>
