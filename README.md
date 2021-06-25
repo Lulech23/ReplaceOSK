@@ -14,7 +14,7 @@ Since Windows 8, Microsoft has been building a modern virtual input method for t
 The Windows on-screen keyboard can be triggered any time by sending `Win + Ctrl + O`!
 
 ## How to Use
-ReplaceOSK is comprised of two components: **ReplaceOSK**, and **TabTipProxy**. Using TabTipProxy is optional, but strongly recommended. TabTipProxy will be used by default if a suitable [.NET Runtime](https://dotnet.microsoft.com/download) is available on the host PC (most installations of Windows 10 should include this by default). At this time, >=4.8 is recommended. As of v2.3, if local compilation fails, ReplaceOSK will automatically attempt to download the latest precompiled TabTipProxy binary right from this repo.
+ReplaceOSK is comprised of two components: **ReplaceOSK**, and **TabTipProxy**. Using TabTipProxy is optional, but strongly recommended. TabTipProxy will be used by default if a suitable [.NET Runtime](https://dotnet.microsoft.com/download) is available on the host PC (most installations of Windows 10 should include this by default). As of v2.3, if no .NET compiler can be found, ReplaceOSK will automatically download the latest precompiled TabTipProxy binary right from this repo.
 
 #### To Install:
 1. Download the latest version of ReplaceOSK from [releases](https://github.com/Lulech23/ReplaceOSK/releases). 
@@ -24,7 +24,7 @@ ReplaceOSK is comprised of two components: **ReplaceOSK**, and **TabTipProxy**. 
 1. Run `ReplaceOSK.bat` again and it'll undo all changes to your system.
 
 #### To Update:
-1. Run `ReplaceOSK.bat` to uninstall previous versions--new versions are backwards-compatible
+1. Run `ReplaceOSK.bat` to uninstall previous versions (new versions are backwards-compatible!)
 2. Run `ReplaceOSK.bat` again to install the new version
 
 Note that changes made by ReplaceOSK are permanent until uninstalled, so you do not need to keep downloaded files on your PC after installation.
@@ -34,9 +34,7 @@ Windows touch input is wildly overcomplicated. A classic win32 application calle
 
 To solve these issues, TabTipProxy was created to act as a middleman between `TabTip.exe` and its child processes. If a suitable .NET Framework is available when running `ReplaceOSK.bat`, TabTipProxy will be generated and compiled as Visual Basic on the user's own machine. This avoids potential issues with Windows treating any invisible application as a virus threat and keeps ReplaceOSK as a project transparent and lightweight.
 
-While TabTipProxy provides a much better experience than vanilla TabTip, if a Visual Basic .NET compiler can't be found on the host PC, ReplaceOSK will fallback to vanilla TabTip instead. The type of installation used will be indicated both during the initial ReplaceOSK operation and in subsequent runs of the Batch script.
+While TabTipProxy provides a much better experience than vanilla TabTip, if a Visual Basic .NET compiler can't be found on the host PC, and attempts to download a precompiled binary fail, ReplaceOSK will fallback to vanilla TabTip instead. The type of installation used will be indicated both during the initial ReplaceOSK operation and in subsequent runs of the Batch script.
 
 ## Known Issues
-* **TabTipProxy sometimes fails to invoke when certain desktop applications are focused**
-    * I'm officially referring to these as "stubborn apps", which currently mostly consist of Chromium-based applications (including Electron et al). As of TabTipProxy v2.3, if normal invocation fails, a fallback will be used instead, but it's far from ideal and requires the user to have the taskbar touch keyboard icon visible (enabled automatically by ReplaceOSK).
-    * Users without TabTipProxy should use the taskbar touch keyboard icon manually.
+* **None for now! Hooray!**
