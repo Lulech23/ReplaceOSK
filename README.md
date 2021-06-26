@@ -7,7 +7,7 @@ Since Windows 8, Microsoft has been building a modern virtual input method for t
 #### You could go from this...
 ![`osk.exe`](/screenshots/osk.jpg)
 
-#### .. To this!
+#### ... To this!
 ![`TabTip.exe`](/screenshots/tabtip.jpg)
 
 ### Did you know?
@@ -37,4 +37,5 @@ To solve these issues, TabTipProxy was created to act as a middleman between `Ta
 While TabTipProxy provides a much better experience than vanilla TabTip, if a Visual Basic .NET compiler can't be found on the host PC, and attempts to download a precompiled binary fail, ReplaceOSK will fallback to vanilla TabTip instead. The type of installation used will be indicated both during the initial ReplaceOSK operation and in subsequent runs of the Batch script.
 
 ## Known Issues
-* **None for now! Hooray!**
+* **Win + Ctrl + O shortcut sometimes fails to close the keyboard while certain applications are focused**
+    * For now, touch 'X' to close
