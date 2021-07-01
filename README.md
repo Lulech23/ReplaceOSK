@@ -1,5 +1,5 @@
 # ⌨ ReplaceOSK
-Replace the legacy Windows 10 on-screen keyboard with a more modern virtual input method!
+Replace the legacy Windows on-screen keyboard with a more modern virtual input method!
 
 ## About
 Since Windows 8, Microsoft has been building a modern virtual input method for touch-based devices inspired by smartphone conventions. Unfortunately, as with many parts of Windows, legacy components continue to linger in the recesses of the operating system. One such component is the legacy OSK, an XP-era on-screen keyboard meant for mice, not fingers. This can be an annoyance when working with some touch-based devices that default to the legacy OSK, so why not get rid of it?
@@ -7,14 +7,16 @@ Since Windows 8, Microsoft has been building a modern virtual input method for t
 #### You could go from this...
 ![`osk.exe`](/screenshots/osk.jpg)
 
-#### ... To this!
+#### .. To this!
 ![`TabTip.exe`](/screenshots/tabtip.jpg)
 
 ### Did you know?
 The Windows on-screen keyboard can be triggered any time by sending `Win + Ctrl + O`!
 
 ## How to Use
-ReplaceOSK is comprised of two components: **ReplaceOSK**, and **TabTipProxy**. Using TabTipProxy is optional, but strongly recommended. TabTipProxy will be used by default if a suitable [.NET Runtime](https://dotnet.microsoft.com/download) is available on the host PC (most installations of Windows 10 should include this by default). As of v2.3, if no .NET compiler can be found, ReplaceOSK will automatically download the latest precompiled TabTipProxy binary right from this repo.
+> Compatible with Windows 8, 10, and 11
+
+ReplaceOSK is comprised of two components: **ReplaceOSK**, and **TabTipProxy**. Using TabTipProxy is optional, but strongly recommended. TabTipProxy will be used by default if a suitable [.NET Runtime](https://dotnet.microsoft.com/download) is available on the host PC (most installations of Windows should include this by default). As of v2.3, if no .NET compiler can be found, ReplaceOSK will automatically download the latest precompiled TabTipProxy binary right from this repo.
 
 #### To Install:
 1. Download the latest version of ReplaceOSK from [releases](https://github.com/Lulech23/ReplaceOSK/releases). 
@@ -37,5 +39,4 @@ To solve these issues, TabTipProxy was created to act as a middleman between `Ta
 While TabTipProxy provides a much better experience than vanilla TabTip, if a Visual Basic .NET compiler can't be found on the host PC, and attempts to download a precompiled binary fail, ReplaceOSK will fallback to vanilla TabTip instead. The type of installation used will be indicated both during the initial ReplaceOSK operation and in subsequent runs of the Batch script.
 
 ## Known Issues
-* **Win + Ctrl + O shortcut sometimes fails to close the keyboard while certain applications are focused**
-    * For now, touch 'X' to close
+* If an elevated process is focused, certain key combinations are no longer accessible (since TabTipProxy doesn't run elevated). This means instead of detecting Win + Ctrl + O, TabTipProxy can just detect... Ctrl. As a result, any Ctrl key combinations (Ctrl + C, Ctrl + V, etc) will also trigger the keyboard to close. Non-elevated processes are not affected.
