@@ -5,18 +5,22 @@ powershell.exe "Get-ExecutionPolicy -Scope 'CurrentUser' | Out-File -FilePath '%
 //  ReplaceOSK by Lulech23  //
 //////////////////////////////
 
-Replace the legacy Windows 10 on-screen keyboard with a more modern virtual input method!
+Replace the legacy Windows on-screen keyboard with a more modern virtual input method!
 
 What's New:
-* Improved invocation for stubborn applications (Chromium et al)--no more dirty fallback
-* Fixed keyboard opening and immediately closing if Win + Ctrl + O shortcut is held too long
-* Internal code improvements
+* Vastly improved TabTipProxy behavior
+    * Fixed keyboard opening, but not closing when running TabTipProxy from .exe
+    * Fixed keyboard "bounce" (immediate open/close and vice-versa)
+    * Fixed Win + Ctrl + O not working in elevated applications (caveat: see "known issues")
+    * Fixed TabTipProxy desynchronization if TapTip.exe isn't running at invocation time
+    * Improved wait-for-release for Win + Ctrl + O shortcut
 
 Notes:
 * Still backwards-compatible with previous versions of ReplaceOSK!
 
 To-do:
-* Waiting for Windows 11...
+* Fix Win + Ctrl + O shortcut when elevated apps are focused
+    * Currently, only Ctrl is detectable, so keyboard will close after any Ctrl shortcut
 #>
 
 
@@ -26,13 +30,13 @@ INITIALIZATION
 
 # Version... obviously
 $version_script = "2.4"
-$version_proxy  = "2.4"
+$version_proxy  = "2.5"
 
 # ReplaceOSK data path
 $path = "$env:AppData\ReplaceOSK"
 
 # TabTipProxy MD5
-$hashTTP = "4AD050F1A374D3204F94919B8DFA55D0" # (Get-FileHash .\TabTipProxy.exe -Algorithm MD5).Hash
+$hashTTP = "DA1973E29D41B0C2BE8456BB1B411C77" # (Get-FileHash .\TabTipProxy.exe -Algorithm MD5).Hash
 
 # External definitions
 Add-Type -AssemblyName System.Windows.Forms 
@@ -167,7 +171,7 @@ if ($task.contains("Install")) {
             "`nImports System.Windows.Forms" + 
             "`n" + 
             "`n' ////////////////////////////////////////////" + 
-            "`n' //     TabTipProxy by Lulech23 [v2.4]     //" + 
+            "`n' //     TabTipProxy by Lulech23 [v2.5]     //" + 
             "`n' ////////////////////////////////////////////" + 
             "`n' " + 
             "`n' This script will open and close the modern Windows touch" + 
@@ -175,18 +179,26 @@ if ($task.contains("Install")) {
             "`n' a legacy OSK replacement." + 
             "`n" + 
             "`nModule mainModule" + 
-            "`n    ' External definitions" + 
+            "`n" + 
+            "`n    ' //////////////////////////" + 
+            "`n    ' // EXTERNAL DEFINITIONS //" + 
+            "`n    ' //////////////////////////" + 
+            "`n" + 
             "`n    Public Class User32" + 
-            "`n        <DllImport(`"user32.dll`", SetLastError:=False)>" + 
+            "`n        <DllImport(`"user32.dll`")> _" + 
+            "`n        Public Shared Function GetAsyncKeyState(ByVal vKey As Keys) As Short" + 
+            "`n        End Function" + 
+            "`n" + 
+            "`n        <DllImport(`"user32.dll`", SetLastError:=False)> _" + 
             "`n        Public Shared Function GetDesktopWindow() As IntPtr" + 
             "`n        End Function" + 
-            "`n" + 
-            "`n        <DllImport(`"user32.dll`")> _" + 
-            "`n        Shared Function GetAsyncKeyState(ByVal vKey As Keys) As Short" + 
-            "`n        End Function" + 
             "`n    End Class" + 
+            "`n    " + 
             "`n" + 
-            "`n    ' Interface definitions" + 
+            "`n    ' ///////////////////////////" + 
+            "`n    ' // INTERFACE DEFINITIONS //" + 
+            "`n    ' ///////////////////////////" + 
+            "`n" + 
             "`n    Public Class Input" + 
             "`n        <ComImport, Guid(`"37c994e7-432b-4834-a2f7-dce1f13b834b`")>" + 
             "`n        <InterfaceType(ComInterfaceType.InterfaceIsIUnknown)>" + 
@@ -217,16 +229,21 @@ if ($task.contains("Install")) {
             "`n            Function Location(<Out> ByRef prcInputPaneScreenLocation As Rectangle) As Integer" + 
             "`n        End Interface        " + 
             "`n    End Class" + 
+            "`n    " + 
+            "`n" + 
+            "`n    ' //////////////////////////" + 
+            "`n    ' // FUNCTION DEFINITIONS //" + 
+            "`n    ' //////////////////////////" + 
             "`n" + 
             "`n    ' Function definitions" + 
-            "`n    Public Class Self" + 
+            "`n    Public Class This" + 
             "`n        Public Shared Function EnforceSingleInstance() As Process" + 
-            "`n            Dim This As Process = Process.GetCurrentProcess()" + 
-            "`n            Dim Procs As Process() = Process.GetProcessesByName(This.ProcessName)" + 
+            "`n            Dim Proc As Process = Process.GetCurrentProcess()" + 
+            "`n            Dim Procs As Process() = Process.GetProcessesByName(Proc.ProcessName)" + 
             "`n" + 
             "`n            If (Procs.Length > 1)" + 
             "`n                For Each p As Process In Procs" + 
-            "`n                    If (p.Id = This.Id) Then" + 
+            "`n                    If (p.Id = Proc.Id) Then" + 
             "`n                        p.Kill()" + 
             "`n                        Exit For" + 
             "`n                    End If" + 
@@ -235,7 +252,48 @@ if ($task.contains("Install")) {
             "`n" + 
             "`n            Return Nothing" + 
             "`n        End Function" + 
+            "`n" + 
+            "`n        Public Shared Function ShortcutIsElevated() As Boolean" + 
+            "`n            ' GetAsyncKeyState always returns 0 if elevated process is focused, but My.Computer.Keyboard returns 1. " + 
+            "`n            ' It is physically impossible for this condition to occur, so if it does, the focused process must be" + 
+            "`n            ' elevated." + 
+            "`n            If ((User32.GetAsyncKeyState(Keys.LControlKey) = 0) And (User32.GetAsyncKeyState(Keys.RControlKey) = 0)) _" + 
+            "`n            And (My.Computer.Keyboard.CtrlKeyDown <> 0) Then" + 
+            "`n                Return True" + 
+            "`n            End If" + 
+            "`n" + 
+            "`n            Return False" + 
+            "`n        End Function" + 
+            "`n" + 
+            "`n        Public Shared Function ShortcutIsDown() As Boolean" + 
+            "`n            ' Get keyboard shortcut state" + 
+            "`n            if      (User32.GetAsyncKeyState(Keys.LControlKey) = 0) _" + 
+            "`n            AndAlso (User32.GetAsyncKeyState(Keys.RControlKey) = 0) _" + 
+            "`n            AndAlso (My.Computer.Keyboard.CtrlKeyDown = 0) _" + 
+            "`n            AndAlso (User32.GetAsyncKeyState(Keys.LWin) = 0) _" + 
+            "`n            AndAlso (User32.GetAsyncKeyState(Keys.RWin) = 0) _" + 
+            "`n            AndAlso (User32.GetAsyncKeyState(Keys.O) = 0) Then" + 
+            "`n                Return False" + 
+            "`n            End If" + 
+            "`n" + 
+            "`n            Return True" + 
+            "`n        End Function" + 
+            "`n" + 
+            "`n        Public Shared Function ShortcutIsPressed() As Boolean" + 
+            "`n            If      ((User32.GetAsyncKeyState(Keys.LControlKey) <> 0) Or (User32.GetAsyncKeyState(Keys.RControlKey) <> 0) Or (My.Computer.Keyboard.CtrlKeyDown <> 0)) _" + 
+            "`n            AndAlso ((User32.GetAsyncKeyState(Keys.LWin) <> 0) Or (User32.GetAsyncKeyState(Keys.RWin) <> 0)) _" + 
+            "`n            AndAlso (User32.GetAsyncKeyState(Keys.O) <> 0) Then" + 
+            "`n                Return True" + 
+            "`n            End If" + 
+            "`n" + 
+            "`n            Return False" + 
+            "`n        End Function" + 
             "`n    End Class" + 
+            "`n" + 
+            "`n" + 
+            "`n    ' /////////////////" + 
+            "`n    ' // TABTIPPROXY //" + 
+            "`n    ' /////////////////" + 
             "`n" + 
             "`n    ' Main Process" + 
             "`n    Sub Main()" + 
@@ -245,7 +303,13 @@ if ($task.contains("Install")) {
             "`n        ' ////////////////////" + 
             "`n        " + 
             "`n        ' Allow only one proxy process" + 
-            "`n        Self.EnforceSingleInstance()" + 
+            "`n        This.EnforceSingleInstance()" + 
+            "`n        " + 
+            "`n        ' Wait for shortcut key release to prevent double input" + 
+            "`n        Dim DoShortcut = False" + 
+            "`n        While (This.ShortcutIsDown())" + 
+            "`n            Threading.Thread.Sleep(100)" + 
+            "`n        End While" + 
             "`n" + 
             "`n        ' Ensure keyboard process is running" + 
             "`n        Dim inHost() As Process " + 
@@ -253,43 +317,53 @@ if ($task.contains("Install")) {
             "`n        If (inHost.Count = 0) Then" + 
             "`n            ' Start new keyboard process, if necessary" + 
             "`n            Process.Start(Environ(`"ProgramFiles`") + `"\Common Files\Microsoft Shared\ink\TabTip.exe`")" + 
-            "`n            Threading.Thread.Sleep(500)" + 
+            "`n            Threading.Thread.Sleep(100)" + 
             "`n        End If" + 
             "`n" + 
             "`n        ' Check keyboard visibility" + 
-            "`n        Dim inputPane = CType(New Input.FrameworkInputPane(), Input.IFrameworkInputPane)" + 
-            "`n        Dim rect = Nothing" + 
-            "`n        inputPane.Location(rect)" + 
-            "`n        " + 
-            "`n        ' Wait for shortcut key release to prevent double input" + 
-            "`n        Dim IsKeyHeld = True" + 
-            "`n        While (IsKeyHeld = True) ' System keys are -127 if held, letters are 1 if held" + 
-            "`n            If ((User32.GetAsyncKeyState(Keys.LWin) = 0) _" + 
-            "`n            And (User32.GetAsyncKeyState(Keys.RWin) = 0) _" + 
-            "`n            And (User32.GetAsyncKeyState(Keys.LControlKey) = 0) _" + 
-            "`n            And (User32.GetAsyncKeyState(Keys.RControlKey) = 0) _" + 
-            "`n            And (User32.GetAsyncKeyState(Keys.O) = 0)) Then" + 
-            "`n                IsKeyHeld = False" + 
-            "`n            Else" + 
-            "`n                Threading.Thread.Sleep(50)" + 
-            "`n            End If" + 
-            "`n        End While" + 
+            "`n        Dim inPane = CType(New Input.FrameworkInputPane(), Input.IFrameworkInputPane)" + 
+            "`n        Dim inRect = Nothing" + 
+            "`n        inPane.Location(inRect)" + 
             "`n" + 
             "`n" + 
             "`n        ' /////////////////////" + 
             "`n        ' // TOGGLE KEYBOARD //" + 
             "`n        ' /////////////////////" + 
             "`n" + 
-            "`n        If ((rect.Width = 0) And (rect.Height = 0)) Then" + 
-            "`n            ' Invoke running keyboard process" + 
+            "`n        ' Perform open interaction" + 
+            "`n        If ((inRect.Width = 0) And (inRect.Height = 0)) Then" + 
             "`n            Dim uiHost = New Input.UIHostNoLaunch()" + 
             "`n            Dim itInvoke = CType(uiHost, Input.ITipInvocation)" + 
             "`n            itInvoke.Toggle(User32.GetDesktopWindow())" + 
             "`n            Marshal.ReleaseComObject(uiHost)" + 
+            "`n" + 
+            "`n            ' Wait for keyboard animation" + 
+            "`n            Threading.Thread.Sleep(1000)" + 
+            "`n        Else" + 
+            "`n            ' Else perform close interaction if keyboard is already open" + 
+            "`n            DoShortcut = True" + 
             "`n        End If" + 
             "`n" + 
-            "`n        ' Wait for keyboard animation" + 
-            "`n        Threading.Thread.Sleep(750)" + 
+            "`n        ' Wait for close interaction" + 
+            "`n        inPane.Location(inRect)" + 
+            "`n        While ((inRect.Width <> 0) And (inRect.Height <> 0))" + 
+            "`n            ' Close with shortcut key, if pressed" + 
+            "`n            If (This.ShortcutIsPressed()) Or (This.ShortcutIsElevated()) Then" + 
+            "`n                DoShortcut = True" + 
+            "`n            End If" + 
+            "`n            If (DoShortcut) Then" + 
+            "`n                If (Not This.ShortcutIsDown()) And (Not This.ShortcutIsElevated()) Then" + 
+            "`n                    Dim uiHost = New Input.UIHostNoLaunch()" + 
+            "`n                    Dim itInvoke = CType(uiHost, Input.ITipInvocation)" + 
+            "`n                    itInvoke.Toggle(User32.GetDesktopWindow())" + 
+            "`n                    Marshal.ReleaseComObject(uiHost)" + 
+            "`n                End If" + 
+            "`n            End If" + 
+            "`n" + 
+            "`n            ' Update process check" + 
+            "`n            Threading.Thread.Sleep(100)" + 
+            "`n            inPane.Location(inRect)" + 
+            "`n        End While" + 
             "`n    End Sub" + 
             "`nEnd Module"
 
