@@ -40,3 +40,11 @@ While TabTipProxy provides a much better experience than vanilla TabTip, if a Vi
 
 ## Known Issues
 * If an elevated process is focused, certain key combinations are no longer accessible (since TabTipProxy doesn't run elevated). This means instead of detecting Win + Ctrl + O, TabTipProxy can just detect... Ctrl. As a result, any Ctrl key combinations (Ctrl + C, Ctrl + V, etc) will also trigger the keyboard to close. Non-elevated processes are not affected.
+* Some systems may deny ReplaceOSK taking ownership of `osk.exe` even when running as Administrator. In this case, ownership must be taken manually.
+    * Navigate to `%WinDir%\System32` and locate `osk.exe`
+    * Right-click and choose **Properties** > **Security** > **Advanced**
+    * Windows will list the current file owner (likely "TrustedInstaller"). Click **Change** to reassign ownership
+    * In the user selection box, type the username or email address you use to log in to your admin account, then click **Check Names**. If your account was entered correctly, Windows will format the entry to the selected user.
+    * Click **OK** > **OK** to accept changes
+    * From the Properties window, click **Edit**, then select your user account and enable **Full Control**
+    * Accept all changes and run ReplaceOSK again
