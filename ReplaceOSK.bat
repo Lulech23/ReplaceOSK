@@ -33,7 +33,7 @@ $version_script = "2.4"
 $version_proxy  = "2.5"
 
 # ReplaceOSK data path
-$path = "$env:AppData\ReplaceOSK"
+$path = "$env:ProgramData\ReplaceOSK"
 
 # TabTipProxy MD5
 $hashTTP = "DA1973E29D41B0C2BE8456BB1B411C77" # (Get-FileHash .\TabTipProxy.exe -Algorithm MD5).Hash
