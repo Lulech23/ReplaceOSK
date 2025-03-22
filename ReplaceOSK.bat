@@ -8,15 +8,8 @@ powershell.exe "Get-ExecutionPolicy -Scope 'CurrentUser' | Out-File -FilePath '%
 Replace the legacy Windows on-screen keyboard with a more modern virtual input method!
 
 What's New:
-* Vastly improved TabTipProxy behavior
-    * Fixed keyboard opening, but not closing when running TabTipProxy from .exe
-    * Fixed keyboard "bounce" (immediate open/close and vice-versa)
-    * Fixed Win + Ctrl + O not working in elevated applications (caveat: see "known issues")
-    * Fixed TabTipProxy desynchronization if TapTip.exe isn't running at invocation time
-    * Improved wait-for-release for Win + Ctrl + O shortcut
-
-Notes:
-* Still backwards-compatible with previous versions of ReplaceOSK!
+* Updated data path to `%ProgramData%` to support multi-user systems
+* Replaced deprecated `wmic` commands with PowerShell-native alternatives
 
 To-do:
 * Fix Win + Ctrl + O shortcut when elevated apps are focused
@@ -29,7 +22,7 @@ INITIALIZATION
 #>
 
 # Version... obviously
-$version_script = "2.4"
+$version_script = "2.5"
 $version_proxy  = "2.5"
 
 # ReplaceOSK data path
@@ -464,7 +457,7 @@ if ($task.contains("Install")) {
         reg add HKCU\SOFTWARE\Microsoft\TabletTip\1.7 /t REG_DWORD /v TipbandDesiredVisibility /d 1 /f | Out-Null
     
         # Restart processes to apply registry changes
-        wmic process where "name='TabTip.exe'" delete | Out-Null
+        Get-CimInstance Win32_Process -Filter "Name='TabTip.exe'" | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
         Restart-Tray
     
         # End process, we're done!
@@ -519,7 +512,7 @@ if ($task.contains("Revert")) {
     reg add HKCU\SOFTWARE\Microsoft\TabletTip\1.7 /t REG_DWORD /v TipbandDesiredVisibility /d 0 /f | Out-Null
     
     # Restart processes to apply registry changes
-    wmic process where "name='TabTip.exe'" delete | Out-Null
+    Get-CimInstance Win32_Process -Filter "Name='TabTip.exe'" | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
     Restart-Tray
     
     # End process, we're done!
